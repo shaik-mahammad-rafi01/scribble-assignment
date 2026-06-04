@@ -150,18 +150,19 @@ export function GamePage() {
         </aside>
 
         <div className="game-page__main">
-          <Card title={isDrawer ? `Your Word: ${room.secretWord || "???"}` : "Canvas"}>
-            <CanvasDisplay
-              canvasData={room.canvasData}
-            />
-            {isDrawer ? (
+          {isDrawer ? (
+            <Card title={`Your Word: ${room.secretWord || "???"}`}>
               <DrawingCanvas
                 canvasData={room.canvasData}
                 onUpdate={handleCanvasUpdate}
                 onClear={handleCanvasClear}
               />
-            ) : null}
-          </Card>
+            </Card>
+          ) : (
+            <Card title="Canvas">
+              <CanvasDisplay canvasData={room.canvasData} />
+            </Card>
+          )}
         </div>
 
         <aside className="game-page__sidebar game-page__sidebar--right">
