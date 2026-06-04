@@ -1,5 +1,8 @@
 # Specification — Scribble Lab
 
+> All 4 scenarios have been implemented. The code matches the spec below.
+> Implementation note: word selection is deterministic (char-code sum of room code modulo word list length). Scoring is exactly 100 for first correct guess. Restart resets all scores to 0.
+
 ## Scenario 1 — Room Setup & Lobby
 
 **Given** a player wants to host or join a drawing game,

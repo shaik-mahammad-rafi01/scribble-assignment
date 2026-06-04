@@ -1,5 +1,7 @@
 # Technical Plan — Scribble Lab
 
+> Fully implemented. All scenarios are complete. See commit history for traceability.
+
 ## State Model
 
 ### Backend (`Room`)
