@@ -1,0 +1,120 @@
+# Technical Plan — Scribble Lab
+
+## State Model
+
+### Backend (`Room`)
+```typescript
+interface Room {
+  code: string;
+  status: "lobby" | "playing" | "result";
+  hostId: string;
+  participants: Participant[];
+  drawerId: string | null;
+  secretWord: string | null;
+  guesses: Guess[];
+  scores: Record<string, number>;  // participantId -> score
+  canvasData: string | null;       // base64 or serialized drawing
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
+### Frontend (`RoomSnapshot`)
+```typescript
+interface RoomSnapshot {
+  code: string;
+  status: "lobby" | "playing" | "result";
+  hostId: string;
+  participants: Participant[];
+  drawerId: string | null;
+  secretWord: string;  // empty string for non-drawers
+  guesses: Guess[];
+  scores: Record<string, number>;
+  canvasData: string | null;
+  availableWords: string[];
+  roles: ParticipantRole[];
+}
+```
+
+## Data Flow
+
+### Lobby Polling
+```
+Frontend → GET /rooms/:code?participantId=xxx → Backend → Room snapshot
+Frontend ← 200 { room: RoomSnapshot }
+Frontend updates store → UI re-renders
+```
+
+### Start Game
+```
+Frontend → POST /rooms/:code/start { participantId } → Backend
+Backend validates: is host? ≥2 players?
+Backend assigns drawer, selects word, sets status=playing
+Frontend ← 200 { room: RoomSnapshot }
+Frontend navigates to /game
+```
+
+### Drawing
+```
+Frontend (drawer) → POST /rooms/:code/draw { participantId, canvasData } → Backend
+Frontend ← 200 { room: RoomSnapshot }
+All players poll GET /rooms/:code to get updated canvasData
+```
+
+### Guess Submission
+```
+Frontend (guesser) → POST /rooms/:code/guess { participantId, text } → Backend
+Backend validates: trim, not empty, case-insensitive compare
+Backend adds guess to history, updates score if correct
+If correct guess, set status=result
+Frontend ← 200 { room: RoomSnapshot }
+```
+
+### Result & Restart
+```
+Frontend (host) → POST /rooms/:code/restart { participantId } → Backend
+Backend validates: is host?
+Backend resets round state, sets status=lobby
+Frontend ← 200 { room: RoomSnapshot }
+Frontend navigates to /lobby
+```
+
+## File-Level Changes
+
+### Backend
+
+| File | Changes |
+|------|---------|
+| `backend/src/models/game.ts` | Add `hostId`, `drawerId`, `secretWord`, `guesses`, `scores`, `canvasData`; expand `RoomStatus` |
+| `backend/src/api/schemas.ts` | Add `startGameSchema`, `submitGuessSchema`, `drawCanvasSchema`, `restartGameSchema`; validate playerName |
+| `backend/src/services/roomStore.ts` | Add `hostId` tracking, `startGame`, `submitGuess`, `updateCanvas`, `restartGame`; update `toRoomSnapshot` for viewer-based visibility |
+| `backend/src/api/rooms.ts` | Add `POST /:code/start`, `POST /:code/guess`, `PUT /:code/draw`, `POST /:code/restart` |
+| `backend/src/seed/starterData.ts` | No changes needed |
+
+### Frontend
+
+| File | Changes |
+|------|---------|
+| `frontend/src/services/api.ts` | Update `RoomSnapshot` type; add `startGame`, `submitGuess`, `updateCanvas`, `restartGame` methods; fix API base URL |
+| `frontend/src/state/roomStore.ts` | Add state fields, actions, auto-polling in lobby/game |
+| `frontend/src/pages/LobbyPage.tsx` | Auto-poll, host-only start button, disabled until ≥2 players |
+| `frontend/src/pages/CreateRoomPage.tsx` | Name validation |
+| `frontend/src/pages/JoinRoomPage.tsx` | Name validation, room code validation |
+| `frontend/src/pages/GamePage.tsx` | Drawing canvas, drawer word display, guesser view, result view |
+| `frontend/src/components/GuessForm.tsx` | Connect to actual API |
+| `frontend/src/components/Scoreboard.tsx` | Display real scores |
+| `frontend/src/components/ResultPanel.tsx` | Display guess history |
+| `frontend/src/styles/app.css` | Canvas styles, minor additions |
+
+## Implementation Sequence
+
+1. **Spec Kit artifacts** — Create discovery, constitution, spec, plan, tasks
+2. **Scenario 1** — Backend: hostId, name validation, start endpoint; Frontend: polling, host-only start button
+3. **Scenario 2** — Backend: drawer assignment, word selection, viewer-based visibility; Frontend: drawer UI, word display
+4. **Scenario 3** — Backend: guess validation, scoring, canvas storage; Frontend: drawing canvas, guess form, scoreboard, history
+5. **Scenario 4** — Backend: result state, restart; Frontend: result view, restart button
+6. **Build validation** — Run builds and tests
+
+## Risks
+- Canvas data transmission via polling may be inefficient for frequent drawing; use throttled updates.
+- Race conditions: two guessers submitting simultaneously; backend handles atomically via Map operations.
