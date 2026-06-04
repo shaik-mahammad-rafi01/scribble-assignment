@@ -3,58 +3,58 @@
 ## Group 1: Room Setup & Lobby (Scenario 1)
 
 ### Backend
-- [ ] T1.1 Add `hostId` to Room model and set on creation
-- [ ] T1.2 Add player name validation (trim, reject empty/whitespace)
-- [ ] T1.3 Add `POST /rooms/:code/start` endpoint with host validation and 2-player minimum
-- [ ] T1.4 Update `toRoomSnapshot` to include `hostId`
+- [x] T1.1 Add `hostId` to Room model and set on creation
+- [x] T1.2 Add player name validation (trim, reject empty/whitespace)
+- [x] T1.3 Add `POST /rooms/:code/start` endpoint with host validation and 2-player minimum
+- [x] T1.4 Update `toRoomSnapshot` to include `hostId`
 
 ### Frontend
-- [ ] T1.5 Update API client with `startGame` method and updated types
-- [ ] T1.6 Fix API base URL (remove `/bug` suffix)
-- [ ] T1.7 Add auto-polling to LobbyPage (~2s interval)
-- [ ] T1.8 Show "Start Game" only for host, disabled until ≥2 players
-- [ ] T1.9 Add name validation on create/join forms
+- [x] T1.5 Update API client with `startGame` method and updated types
+- [x] T1.6 Fix API base URL (remove `/bug` suffix)
+- [x] T1.7 Add auto-polling to LobbyPage (~2s interval)
+- [x] T1.8 Show "Start Game" only for host, disabled until ≥2 players
+- [x] T1.9 Add name validation on create/join forms
 
 ## Group 2: Game Start & Drawer Flow (Scenario 2)
 
 ### Backend
-- [ ] T2.1 Add `drawerId` and `secretWord` to Room model
-- [ ] T2.2 Implement drawer assignment (host is drawer)
-- [ ] T2.3 Implement deterministic word selection
-- [ ] T2.4 Update `toRoomSnapshot` to hide word from non-drawers
+- [x] T2.1 Add `drawerId` and `secretWord` to Room model
+- [x] T2.2 Implement drawer assignment (host is drawer)
+- [x] T2.3 Implement deterministic word selection (char-code sum of room code)
+- [x] T2.4 Update `toRoomSnapshot` to hide word from non-drawers
 
 ### Frontend
-- [ ] T2.5 Show secret word to drawer only
-- [ ] T2.6 Show "Waiting for drawer" to guessers
-- [ ] T2.7 Navigate to game on successful start
+- [x] T2.5 Show secret word to drawer only (in GamePage card title)
+- [x] T2.6 Show "Waiting for drawing..." to guessers (CanvasDisplay)
+- [x] T2.7 Navigate to game on successful start (status change detected in LobbyPage)
 
 ## Group 3: Gameplay Interaction (Scenario 3)
 
 ### Backend
-- [ ] T3.1 Add `guesses[]`, `scores{}`, `canvasData` to Room model
-- [ ] T3.2 Add `POST /rooms/:code/guess` endpoint with validation and scoring
-- [ ] T3.3 Add `PUT /rooms/:code/draw` endpoint for canvas data
-- [ ] T3.4 Add `POST /rooms/:code/clear-canvas` endpoint
+- [x] T3.1 Add `guesses[]`, `scores{}`, `canvasData` to Room model
+- [x] T3.2 Add `POST /rooms/:code/guess` endpoint with validation and scoring
+- [x] T3.3 Add `PUT /rooms/:code/draw` endpoint for canvas data
+- [x] T3.4 Add `POST /rooms/:code/clear-canvas` endpoint
 
 ### Frontend
-- [ ] T3.5 Implement interactive drawing canvas (mouse/touch)
-- [ ] T3.6 Implement clear canvas button
-- [ ] T3.7 Connect GuessForm to API
-- [ ] T3.8 Display guess history in ResultPanel
-- [ ] T3.9 Display scores in Scoreboard
-- [ ] T3.10 Poll game state for canvas and guess updates
+- [x] T3.5 Implement interactive drawing canvas (mouse/touch in DrawingCanvas)
+- [x] T3.6 Implement clear canvas button
+- [x] T3.7 Connect GuessForm to API with validation
+- [x] T3.8 Display guess history in ResultPanel
+- [x] T3.9 Display scores in Scoreboard
+- [x] T3.10 Poll game state for canvas and guess updates (usePolling in GamePage)
 
 ## Group 4: Result, Restart & Final Validation (Scenario 4)
 
 ### Backend
-- [ ] T4.1 Auto-transition to `result` status on correct guess
-- [ ] T4.2 Add `POST /rooms/:code/restart` endpoint
-- [ ] T4.3 Restart resets round state but preserves participants
+- [x] T4.1 Auto-transition to `result` status on correct guess
+- [x] T4.2 Add `POST /rooms/:code/restart` endpoint
+- [x] T4.3 Restart resets round state but preserves participants
 
 ### Frontend
-- [ ] T4.4 Show result view (correct word, final scores, guess history)
-- [ ] T4.5 Show "Play Again" button for host
-- [ ] T4.6 Navigate back to lobby on restart
+- [x] T4.4 Show result view (correct word, final scores, guess history in GamePage)
+- [x] T4.5 Show "Play Again" button for host
+- [x] T4.6 Navigate back to lobby on restart (status change detection in GamePage)
 
 ## Dependencies
 - T1.x must be completed before T2.x
