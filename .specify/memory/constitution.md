@@ -1,4 +1,4 @@
-# Speckit Constitution — Scribble Lab
+# Constitution — Scribble Lab
 
 ## Engineering Principles
 1. **TypeScript First**: All code must be fully typed. Avoid `any`; use `unknown` for dynamic types.
